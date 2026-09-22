@@ -10,11 +10,11 @@ const accountController = require("../controllers/accountController");
 
 const router = express.Router();
 
+router.post("/deposit", validate(validateDeposit), accountController.deposit);
+
 router.use(authenticate);
 
 router.get("/balance", accountController.getBalance);
-
-router.post("/deposit", validate(validateDeposit), accountController.deposit);
 
 router.post("/pin", validate(validateCreatePin), accountController.createPin);
 

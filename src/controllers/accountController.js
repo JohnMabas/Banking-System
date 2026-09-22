@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 const AppError = require("../utils/AppError");
 const asyncHandler = require("../utils/asyncHandler");
 const userStore = require("../data/users");
-const { findUserById, setUserPin, deposit } = userStore;
+const { findUserById, findUserByAccountNumber, setUserPin, deposit } = userStore;
 
 const BCRYPT_SALT_ROUNDS = 10;
 
@@ -27,12 +27,12 @@ exports.getBalance = asyncHandler(async (req, res) => {
 
 
 exports.deposit = asyncHandler(async (req, res) => {
-  const user = findUserById(req.user.id);
+  const { accountNumber, amount } = req.validatedBody;
+  const user = findUserByAccountNumber(accountNumber);
   if (!user) {
-    throw new AppError("User not found.", 404);
+    throw new AppError("Account not found.", 404);
   }
 
-  const { amount } = req.validatedBody;
   deposit(user.id, amount);
 
   res.status(200).json({
@@ -63,7 +63,7 @@ exports.createPin = asyncHandler(async (req, res) => {
   res.status(201).json({
     success: true,
     message: "Pin created successfully.",
-    data: null,
+    data: { pinHash: hashedPin },
   });
 });
 

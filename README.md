@@ -23,12 +23,16 @@ A beginner-friendly banking REST API built with Node.js and Express.js.
 | POST   | /api/auth/register    | No   | Register a user                  |
 | POST   | /api/auth/login       | No   | Login, returns JWT               |
 | GET    | /api/account/balance  | Yes  | View your balance                |
-| POST   | /api/account/deposit  | Yes  | Add funds to your account        |
+| POST   | /api/account/deposit  | No   | Deposit by account number        |
 | POST   | /api/account/pin      | Yes  | Create a PIN                     |
 | PATCH  | /api/account/pin      | Yes  | Update PIN (needs current PIN)   |
-| POST   | /api/transfer         | Yes  | Transfer to another user by email|
+| POST   | /api/transfer         | Yes  | Transfer to another user by account number|
 
 Send authenticated requests with header: `Authorization: Bearer <token>`
+
+Deposit does not require auth; send body: `{ "accountNumber": "<10-digit account number>", "amount": <positive number> }`
+
+Transfer body: `{ "recipientAccountNumber": "<10-digit account number>", "pin": "<4-digit pin>", "amount": <positive number> }`
 
 Pins are stored as bcrypt hashes; passwords are hashed with bcrypt.# Banking-System
 # Banking-System

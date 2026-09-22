@@ -89,22 +89,30 @@ function validateUpdatePin(body) {
 
 
 function validateDeposit(body) {
+  const accountNumber = requireStringField(body, "accountNumber", "accountNumber");
   const amount = body.amount;
+
+  const trimmedAccountNumber = accountNumber.trim();
+  if (!/^\d{10}$/.test(trimmedAccountNumber)) {
+    throw new AppError("accountNumber must be a 10-digit number.", 400);
+  }
+
   if (typeof amount !== "number" || !Number.isFinite(amount) || amount <= 0) {
     throw new AppError("amount must be a positive number.", 400);
   }
-  return { amount };
+
+  return { accountNumber: trimmedAccountNumber, amount };
 }
 
 
 function validateTransfer(body) {
-  const recipientEmail = requireStringField(body, "recipientEmail", "recipientEmail");
+  const recipientAccountNumber = requireStringField(body, "recipientAccountNumber", "recipientAccountNumber");
   const pin = requireStringField(body, "pin", "pin");
   const amount = body.amount;
 
-  const normalizedEmail = recipientEmail.trim().toLowerCase();
-  if (!EMAIL_REGEX.test(normalizedEmail)) {
-    throw new AppError("recipientEmail must be a valid email address.", 400);
+  const trimmedAccountNumber = recipientAccountNumber.trim();
+  if (!/^\d{10}$/.test(trimmedAccountNumber)) {
+    throw new AppError("recipientAccountNumber must be a 10-digit number.", 400);
   }
 
   if (!PIN_PATTERN.test(pin)) {
@@ -115,7 +123,7 @@ function validateTransfer(body) {
     throw new AppError("amount must be a positive number.", 400);
   }
 
-  return { recipientEmail: normalizedEmail, pin, amount };
+  return { recipientAccountNumber: trimmedAccountNumber, pin, amount };
 }
 
 module.exports = {

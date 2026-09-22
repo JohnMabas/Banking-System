@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 const AppError = require("../utils/AppError");
 const asyncHandler = require("../utils/asyncHandler");
-const { findUserById, findUserByEmail, transfer } = require("../data/users");
+const { findUserById, findUserByAccountNumber, transfer } = require("../data/users");
 
 
 exports.makeTransfer = asyncHandler(async (req, res) => {
@@ -13,16 +13,16 @@ exports.makeTransfer = asyncHandler(async (req, res) => {
     throw new AppError("Create a pin before making transfers.", 400);
   }
 
-  const { recipientEmail, pin, amount } = req.validatedBody;
+  const { recipientAccountNumber, pin, amount } = req.validatedBody;
   const pinMatches = await bcrypt.compare(pin, sender.pin);
   if (!pinMatches) {
     throw new AppError("Invalid pin.", 401);
   }
-  if (recipientEmail === sender.email) {
+  if (recipientAccountNumber === sender.accountNumber) {
     throw new AppError("You cannot transfer to yourself.", 400);
   }
 
-  const recipient = findUserByEmail(recipientEmail);
+  const recipient = findUserByAccountNumber(recipientAccountNumber);
   if (!recipient) {
     throw new AppError("Recipient not found.", 404);
   }
@@ -33,7 +33,7 @@ exports.makeTransfer = asyncHandler(async (req, res) => {
     success: true,
     message: "Transfer successful.",
     data: {
-      recipientEmail,
+      recipientAccountNumber,
       amount,
       newBalance: sender.balance,
     },
